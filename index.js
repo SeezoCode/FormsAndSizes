@@ -280,12 +280,6 @@ let chart = new Chart(document.getElementById("line-chart"), {
             label: "BMI",
             borderColor: "#3e95cd",
             fill: false
-        },
-        {
-            data: [],
-            label: "Normal",
-            borderColor: "#3ecd45",
-            fill: false
         }
         ]
     },
