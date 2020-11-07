@@ -81,24 +81,14 @@
                                 aria-describedby="helpId">
                         </div>
 
-                        <div class="form-group" id="formdiv">
-                            <p for="" class="ps">Sex</p>
-                            <div style="width: 222px">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="male"
-                                        name="sex">
-                                    <label class="custom-control-label" for="male" style="width: 80px"
-                                        id="male">Male</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="female"
-                                        name="sex">
-                                    <label class="custom-control-label" for="female" style="width: 80px">Female</label>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <p for="exampleFormControlSelect1" class="ps">Gender</p>
+                            <select class="form-control" id="options" style="width: 222px;">
+                                <option>Please specify</option>
+                            </select>
                         </div>
 
-                        <div class="form-group" id="formdiv">
+                        <div class="form-group" id="formdiv" style="margin-top: 20px">
                             <p for="" class="ps">Age</p>
                             <input type="text" name="age" id="age" class="form-control" placeholder=""
                                 aria-describedby="helpId">
@@ -130,7 +120,7 @@
     <br>
     <hr>
     <div id="bmiTextAnim"></div>
-    <p id="bmiText" class="container">Your evaluation</p>
+<!--    <p id="bmiText" class="container">Your evaluation</p>-->
     <hr>
 
 
