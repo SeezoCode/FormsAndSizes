@@ -57,7 +57,9 @@ function updateBoard(res) {
             sex.checked = res.data.sex === sex.id;
         }
 
-        document.getElementById('bmiText').innerHTML = getMessageAcross(res.data.BMI, res.data.age)
+        let results = ['Too thin', 'normal', 'Slightly overweight', 'Obese', 'You are Morbidly Obese!']
+        document.getElementById('bmiText').innerHTML = getMessageAcross(res.data.BMI, res.data.age, results)
+        spinTextNode(document.getElementById('bmiTextAnim'), results[4], 2)
     }
     catch (e) {}
 }
@@ -86,20 +88,20 @@ loginSubmit.addEventListener('click', () => {
 })
 
 
-function getMessageAcross(bmi, age) {
+function getMessageAcross(bmi, age, results) {
     if (!bmi) return '&nbsp;'
     let ageGroups = [[0,24], [25, 34], [35, 44], [45, 54], [55, 64], [65, 200]]
     for (let i = 0; i < ageGroups.length; i++) {
         if (age >= ageGroups[i][0] && age <= ageGroups[i][1]) {
-            if (bmi < 19 + i)                   return 'Too thin'
-            if (bmi >= 19 + i && bmi <= 24 + i) return 'normal'
-            if (bmi >= 24 + i && bmi <= 29 + i) return 'slightly overweight'
-            if (bmi >= 29 + i && bmi <= 39 + i) return 'Obese'
-            if (bmi > 39 + i)                   return 'You are morbidly obese!'
+            if (bmi < 19 + i)                   return results[0];
+            if (bmi >= 19 + i && bmi <= 24 + i) return results[1];
+            if (bmi >= 24 + i && bmi <= 29 + i) return results[2];
+            if (bmi >= 29 + i && bmi <= 39 + i) return results[3];
+            if (bmi > 39 + i)                   return results[4];
         }
     }
-    if (bmi > 60)                               return 'Chunky Old Man'
-                                                return 'Old Man'
+    if (bmi > 60)                               return 'Chunky Old Man';
+                                                return 'Old Man';
 }
 
 
@@ -121,5 +123,50 @@ window.addEventListener('resize', () => loginBox())
 function loginBox() {
     let width = window.innerWidth
     document.getElementById('login').style.left = ((width - 242 - 35)) + 'px'
-
 }
+window.addEventListener('load', () => animateLogin(.3))
+
+function spinTextNode(element, text, speed) {
+    // let time = 0 // 0 represents 0; Pi / 2 represents 1; Pi represents 0
+    let width = window.innerWidth
+    let textNode = spawnText(element, text)
+    console.log(textNode)
+
+    gsap.to(textNode, {
+        duration: speed / 2,
+        fontSize: 50,
+        ease: 'sine.out',
+        // ease: CustomEase.create('custom', 'M0,0 C0,0 0.169,0.375 0.5,0.5 0.84,0.628 1,1 1,1'),
+        x: (width + textNode.clientWidth / 2) / 2,
+    })
+
+    gsap.to(textNode, {
+        duration: speed / 2,
+        fontSize: 30,
+        ease: 'sine.in',
+        // ease: CustomEase.create('custom', 'M0,0 C0,0 0.169,0.375 0.5,0.5 0.84,0.628 1,1 1,1'),
+        x: (width + textNode.clientWidth),
+        delay: speed / 2
+    })
+
+    // function hold() {
+    //     let sin = Math.sin(time)
+    //     time += .01
+    //     console.log(time, sin)
+    //
+    //     textNode.style.marginLeft = (sin * width) + 'px'
+    //     if (time <= Math.PI) requestAnimationFrame(hold)
+    // }
+    function spawnText(id, text) {
+        let h = document.createElement("p");
+        let t = document.createTextNode("Hello World");
+        h.appendChild(t);
+        h.style.display = 'block';
+        h.style.position = 'fixed';
+        id.appendChild(h)
+        h.style.marginLeft = -h.clientWidth + 'px'
+        return h
+    }
+}
+
+
