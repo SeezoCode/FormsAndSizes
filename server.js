@@ -1,6 +1,21 @@
-
+let addr
 const http = require('http');
-let users = []
+const fs = require('fs')
+require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+    console.log(`http://${add}:8080`);
+    addr = `http://${add}:8080`
+})
+
+let users
+try {
+    users = JSON.parse(fs.readFileSync('data.txt'))
+    console.log('data read')
+}
+catch (e) {
+    users = []
+    fs.writeFileSync('data.txt', JSON.stringify([]))
+    console.log('created new dataset')
+}
 
 class Person {
     constructor(email, password) {
@@ -13,13 +28,16 @@ class Person {
             age: '',
             weight: '',
             height: '',
-            BMI: 0
+            BMI: []
         }
     }
 
-    updateBMI() {
-        this.data.BMI = Number(this.data.weight) / Number(this.data.height / 100) ** 2;
+    // updateBMI() {
+    //     this.data.BMI.push(Number(this.data.weight) / Number(this.data.height / 100) ** 2);
+// }
 }
+function updateBMI(user) {
+    user.data.BMI.push(Number(user.data.weight) / Number(user.data.height / 100) ** 2);
 }
 
 function userControl(email, password) {
@@ -39,12 +57,12 @@ function userControl(email, password) {
 function userData(email, data) {
     for (let user of users) {
         if (user.email === email) {
-            if (data.name != user.data.name && data.name != '') user.data.name = data.name;
-            if (data.sex != user.data.sex && data.sex != '') user.data.sex = data.sex;
-            if (data.age != user.data.age && data.age != '') user.data.age = data.age;
-            if (data.weight != user.data.weight && data.weight != '') user.data.weight = data.weight;
-            if (data.height != user.data.height && data.height != '') user.data.height = data.height;
-            user.updateBMI()
+            if (data.name !== user.data.name && data.name !== '') user.data.name = data.name;
+            if (data.sex !== user.data.sex && data.sex !== '') user.data.sex = data.sex;
+            if (data.age !== user.data.age && data.age !== '') user.data.age = data.age;
+            if (data.weight !== user.data.weight && data.weight !== '') user.data.weight = data.weight;
+            if (data.height !== user.data.height && data.height !== '') user.data.height = data.height;
+            updateBMI(user)
             // user.data = data;
             user.message = 'user update successful!'
             return user
@@ -56,6 +74,14 @@ function userData(email, data) {
 
 const server = http.createServer();
 server.on('request', (req, res) => {
+    if (req.method === 'GET') {
+        res.writeHead(200, {
+            'Content-Type': 'text/HTML',
+            'Access-Control-Allow-Origin': '*',
+        });
+        res.write(`${fs.readFileSync('index.html')} <script>window.address = '${addr}'; ${fs.readFileSync('index.js')}</script>`)
+        res.end()
+    }
     if (req.method === 'POST') {
         let data = readStream(req).then(data => {
             data = JSON.parse(data);
@@ -68,11 +94,12 @@ server.on('request', (req, res) => {
                 console.log('BMI data: ', data)
                 response(res, JSON.stringify(userData(data.email, data)))
             }
+            fs.writeFile('data.txt', JSON.stringify(users), err => {
+                if (err) console.log('error: ', err)
+                else console.log("Write to file successful")
+            })
         })
     }
-
-
-
 })
 server.listen(8080);
 
@@ -98,6 +125,6 @@ function readStream(stream) {
 
 
 
-setInterval(() => {
-    console.log(users);
-}, 10000);
+// setInterval(() => {
+//     console.log(users);
+// }, 10000);

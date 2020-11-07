@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
 
     <style>
         .ps {
@@ -112,16 +113,16 @@
                 </div>
             </div>
             <div class="col-md">
-                <p style="font-size: 50px; margin-top: 50px" id="bmi">BMI Result: </p>
+                <p style="font-size: 50px;" id="bmi">BMI Result: </p>
+                <canvas id="line-chart" width="100%" height="50px"></canvas>
             </div>
         </div>
     </div>
 
     <br>
     <hr>
-    <div id="bmiTextAnim"></div>
+    <div id="bmiTextAnim" style="margin-bottom: 140px"><p id="text" style="position:absolute; font-size: 80px"></p></div>
 <!--    <p id="bmiText" class="container">Your evaluation</p>-->
-    <hr>
 
 
 
@@ -136,7 +137,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
     </script>
-    <script src="index.js"></script>
+<!--    <script src="index.js"></script>-->
 </body>
 
 </html>

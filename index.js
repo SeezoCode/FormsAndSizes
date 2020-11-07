@@ -1,12 +1,17 @@
+if (!window.address) {
+    window.address = 'http://localhost:8080'
+}
+
 let print = console.log
 let submitButton = document.getElementById('submit');
 let textNode
+let refreshGraph = true
 
 submitButton.addEventListener('click', () => {
     if (!email.value) {
         alert("Please log in first!")
         login.style.display = 'block';
-        animateLogin(.025)
+        animateLogin(.020)
         return
     }
 
@@ -27,7 +32,7 @@ submitButton.addEventListener('click', () => {
 
 async function postToServer(data) {
     try {
-        let response = await fetch('http://localhost:8080', {
+        let response = await fetch(window.address, {
             method: 'POST',
             'content-Type': 'application/json',
             body: data
@@ -40,7 +45,7 @@ async function postToServer(data) {
         // let sex = document.getElementById('sex')
         if (!(res.data.message === 'new account created')) updateBoard(res)
     } catch (e) {
-        alert('Please turn on the server included with the download')
+        alert('Please turn on the server included with the download... Or just wrong password')
     }
 }
 
@@ -50,13 +55,27 @@ function updateBoard(res) {
         document.getElementById('age').value = res.data.age;
         document.getElementById('weight').value = res.data.weight;
         document.getElementById('height').value = res.data.height;
-        document.getElementById('bmi').innerHTML = "BMI Result: " + String(Math.round(res.data.BMI * 100) / 100);
+        document.getElementById('bmi').innerHTML = "BMI Result: " + String(Math.round(res.data.BMI[res.data.BMI.length-1] * 100) / 100);
         document.getElementById('options').value = res.data.sex;
 
-        let results = ['Too thin', 'normal', 'Slightly overweight', 'Obese', 'You are Morbidly Obese!']
+        if (!chart.data.labels.length || refreshGraph) {
+            res.data.BMI.forEach((e, i) => {
+                addData(chart, i + 1, e)
+            })
+            console.log(1, refreshGraph)
+            refreshGraph = false
+        }
+        else {
+            addData(chart, res.data.BMI.length, res.data.BMI[res.data.BMI.length-1])
+            console.log(2)
+        }
+        let results = ['Too thin', 'Normal BMI', 'Slightly overweight', 'Obese', 'You are Morbidly Obese!', 'Old Man']
         // document.getElementById('bmiText').innerHTML = getMessageAcross(res.data.BMI, res.data.age, results)
-        spinTextNode(document.getElementById('bmiTextAnim'),
-            getMessageAcross(res.data.BMI, res.data.age, results), 2, false)
+        // spinTextNode(document.getElementById('bmiTextAnim'),
+        //     getMessageAcross(res.data.BMI, res.data.age, results), 2, true)
+        console.log(res.data.BMI)
+        if (JSON.stringify(res.data.BMI) !== JSON.stringify([])) lotteryWrapper(results,
+            getMessageAcross(res.data.BMI[res.data.BMI.length-1], res.data.age, results))
     } catch (e) {}
 }
 
@@ -80,6 +99,8 @@ loginSubmit.addEventListener('click', () => {
     values.email = email.value;
     values.password = password.value;
     values.type = 'login';
+    refreshGraph = true
+    removeData(chart)
     postToServer(JSON.stringify(values))
 })
 
@@ -103,11 +124,11 @@ function getMessageAcross(bmi, age, results) {
             if (bmi > 39 + i)                   return results[4];
         }
     }
-    if (bmi > 60) return 'Chunky Old Man';
+    // if (bmi > 60) return 'Chunky Old Man';
     return 'Old Man';
 }
 
-
+loginBox()
 function animateLogin(speed) {
     let time = Math.PI / 2
     requestAnimationFrame(hold)
@@ -122,7 +143,6 @@ function animateLogin(speed) {
     }
 }
 
-loginBox()
 window.addEventListener('resize', () => loginBox())
 
 function loginBox() {
@@ -132,7 +152,7 @@ function loginBox() {
 window.addEventListener('load', () => animateLogin(.3))
 
 function spinTextNode(element, text, speed, exitScreen) {
-    // document.getElementById('bmiTextAnim').removeChild(currentTextNode)
+
     // let time = 0 // 0 represents 0; Pi / 2 represents 1; Pi represents 0
     let width = window.innerWidth
     textNode = spawnText(element, text)
@@ -147,14 +167,7 @@ function spinTextNode(element, text, speed, exitScreen) {
     })
 
     if (exitScreen) {
-        gsap.to(textNode, {
-            duration: speed / 2,
-            fontSize: 30,
-            ease: 'sine.in',
-            // ease: CustomEase.create('custom', 'M0,0 C0,0 0.169,0.375 0.5,0.5 0.84,0.628 1,1 1,1'),
-            x: (width + textNode.clientWidth),
-            delay: speed / 2
-        })
+        escapeScreen(textNode, speed, width)
     }
 
     // function hold() {
@@ -179,9 +192,123 @@ function spinTextNode(element, text, speed, exitScreen) {
 }
 
 
-["AFAB", "Agender", "Aliagender", "AMAB", "Androgyne", "Aporagender", "Bigender", "Binarism", "Body dysphoria", "Boi", "Butch", "Cisgender", "Cisnormativity", "Cissexism", "Demiboy", "Demigender", "Demigirl", "Dyadic", "Feminine-of-center", "Feminine-presenting", "Femme", "Female-to-male (FTM)", "Gender apathetic", "Gender binary", "Gender dysphoria", "Gender expression", "Gender identity", "Gender-neutral pronouns", "Gender nonconforming", "Gender normative", "Gender presentation", "Gender questioning", "Gender roles", "Gender variant", "Genderfluid", "Genderfuck", "Genderqueer", "Graygender", "Intergender", "Intersex", "Masculine-of-center", "Masculine-presenting", "Maverique", "Misgender", "Male-to-female (MTF)", "Multi-gender", "Neutrois", "Nonbinary", "Novigender", "Pangender", "Polygender", "Sex", "Sex assigned at birth", "Social dysphoria", "Soft butch", "Stone butch", "Third gender", "Transfeminine", "Transgender or trans", "Transmasculine", "Transitioning", "Transsexual", "Trigender", "Two-spirit"].forEach(e => {
+function escapeScreen(textNode, speed, width) {
+    gsap.to(textNode, {
+        duration: speed / 2,
+        fontSize: 30,
+        ease: 'sine.in',
+        // ease: CustomEase.create('custom', 'M0,0 C0,0 0.169,0.375 0.5,0.5 0.84,0.628 1,1 1,1'),
+        x: (width + textNode.clientWidth),
+        delay: speed / 2
+    })
+}
+
+// lotteryWrapper(['Too thin', 'normal', 'Slightly overweight', 'Obese', 'You are Morbidly Obese!'], 'neither')
+function lotteryWrapper(options, result) {
+    let time = Math.PI / 2;
+    let val = 0
+    let lastUsedIndex = 0
+
+    let text = document.getElementById('text')
+    text.innerHTML = 'resolving...';
+    text.style.color = 'rgb(200, 200, 200)'
+    text.style.marginLeft = ((window.innerWidth) / 3 - 90) + 'px'
+
+    requestAnimationFrame(hold)
+    function hold() {
+        let sin = Math.sin(time)
+        val += sin
+        // console.log(val, Math.sin(time))
+
+        let currIndex = Math.round(val) % options.length
+
+        if (currIndex !== lastUsedIndex) {
+            lastUsedIndex = currIndex
+            spinTextNode(document.getElementById('bmiTextAnim'), options[currIndex],
+                1 / sin ** 1.6 / 5, true)
+            // console.log(1 / sin ** 1.6 / 5)
+        }
+        time += .01
+        if (1 / sin ** 1.6 / 5 <= 1 || options[currIndex + 1] !== result) requestAnimationFrame(hold)
+        else endLottery()
+    }
+
+    function endLottery() {
+        setTimeout(() => {
+            spinTextNode(document.getElementById('bmiTextAnim'), result,
+                5, false)
+            setTimeout(() => {
+                let text = document.getElementById('text')
+                text.innerHTML = result;
+                text.style.color = 'rgb(0, 0, 0)'
+                text.style.marginLeft = ((window.innerWidth) / 3 - 90) + 'px'
+                removeElements()
+            }, 3000)
+        }, 180)
+    }
+    // spinTextNode()
+}
+
+
+["AFAB", "Agender", "Aliagender", "AMAB", "Androgyne", "Aporagender", "Bigender", "Binarism", "Body dysphoria", "Boi",
+    "Butch", "Cisgender", "Cisnormativity", "Cissexism", "Demiboy", "Demigender", "Demigirl", "Dyadic", "Feminine-of-center",
+    "Feminine-presenting", "Femme", "Female-to-male (FTM)", "Gender apathetic", "Gender binary", "Gender dysphoria",
+    "Gender expression", "Gender identity", "Gender-neutral pronouns", "Gender nonconforming", "Gender normative",
+    "Gender presentation", "Gender questioning", "Gender roles", "Gender variant", "Genderfluid", "Genderfuck", "Genderqueer",
+    "Graygender", "Intergender", "Intersex", "Masculine-of-center", "Masculine-presenting", "Maverique", "Misgender",
+    "Male-to-female (MTF)", "Multi-gender", "Neutrois", "Nonbinary", "Novigender", "Pangender", "Polygender", "Sex",
+    "Sex assigned at birth", "Social dysphoria", "Soft butch", "Stone butch", "Third gender", "Transfeminine",
+    "Transgender or trans", "Transmasculine", "Transitioning", "Transsexual", "Trigender", "Two-spirit"].forEach(e => {
     let h = document.createElement('option')
     h.innerHTML = e
     document.getElementById('options').appendChild(h)
 })
 document.getElementById('options').addEventListener('select', e => console.log(e))
+
+
+window.addEventListener('scroll', () => removeElements())
+function removeElements() {
+    document.querySelectorAll('#evaluation').forEach(e => {e.remove()})
+}
+
+let chart = new Chart(document.getElementById("line-chart"), {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            data: [],
+            label: "BMI",
+            borderColor: "#3e95cd",
+            fill: false
+        },
+        {
+            data: [],
+            label: "Normal",
+            borderColor: "#3ecd45",
+            fill: false
+        }
+        ]
+    },
+    options: {
+        title: {
+            display: true,
+            text: 'Your data visualized'
+        }
+    }
+});
+
+function addData(chart, label, data) {
+    chart.data.labels.push(label);
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(data);
+    });
+    chart.update();
+}
+
+function removeData(chart) {
+    chart.data.labels = [];
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data = [];
+    });
+    chart.update();
+}
