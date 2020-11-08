@@ -26,8 +26,8 @@ class Person {
             name: '',
             sex: '',
             age: '',
-            weight: '',
-            height: '',
+            weight: [],
+            height: [],
             BMI: []
         }
     }
@@ -37,7 +37,13 @@ class Person {
 // }
 }
 function updateBMI(user) {
-    user.data.BMI.push(Number(user.data.weight) / Number(user.data.height / 100) ** 2);
+    user.data.BMI.push(Number(user.data.weight[user.data.weight.length-1]) / Number(user.data.height[user.data.height.length-1] / 100) ** 2);
+}
+function pushWeight(user, weight) {
+    user.data.weight.push(weight);
+}
+function pushHeight(user, height) {
+    user.data.height.push(height);
 }
 
 function userControl(email, password) {
@@ -60,8 +66,10 @@ function userData(email, data) {
             if (data.name !== user.data.name && data.name !== '') user.data.name = data.name;
             if (data.sex !== user.data.sex && data.sex !== '') user.data.sex = data.sex;
             if (data.age !== user.data.age && data.age !== '') user.data.age = data.age;
-            if (data.weight !== user.data.weight && data.weight !== '') user.data.weight = data.weight;
-            if (data.height !== user.data.height && data.height !== '') user.data.height = data.height;
+            // if (data.weight !== user.data.weight && data.weight !== '') user.data.weight = data.weight;
+            // if (data.height !== user.data.height && data.height !== '') user.data.height = data.height;
+            pushHeight(user, data.height)
+            pushWeight(user, data.weight)
             updateBMI(user)
             // user.data = data;
             user.message = 'user update successful!'

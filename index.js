@@ -53,20 +53,21 @@ function updateBoard(res) {
     try {
         document.getElementById('name').value = res.data.name;
         document.getElementById('age').value = res.data.age;
-        document.getElementById('weight').value = res.data.weight;
-        document.getElementById('height').value = res.data.height;
+        document.getElementById('weight').value = res.data.weight[res.data.weight.length-1] || '';
+        document.getElementById('height').value = res.data.height[res.data.height.length-1] || '';
         document.getElementById('bmi').innerHTML = "BMI Result: " + String(Math.round(res.data.BMI[res.data.BMI.length-1] * 100) / 100);
         document.getElementById('options').value = res.data.sex;
 
+        console.log(res)
         if (!chart.data.labels.length || refreshGraph) {
             res.data.BMI.forEach((e, i) => {
-                addData(chart, i + 1, e)
+                addData(chart, i + 1, [e, res.data.weight[i], res.data.height[i]])
             })
             console.log(1, refreshGraph)
             refreshGraph = false
         }
         else {
-            addData(chart, res.data.BMI.length, res.data.BMI[res.data.BMI.length-1])
+            addData(chart, res.data.BMI.length, [res.data.BMI[res.data.BMI.length-1], res.data.weight[res.data.weight.length-1], res.data.height[res.data.height.length-1]])
             console.log(2)
         }
         let results = ['Too thin', 'Normal BMI', 'Slightly overweight', 'Obese', 'You are Morbidly Obese!', 'Old Man']
@@ -241,7 +242,7 @@ function lotteryWrapper(options, result) {
                 let text = document.getElementById('text')
                 text.innerHTML = result;
                 text.style.color = 'rgb(0, 0, 0)'
-                text.style.marginLeft = ((window.innerWidth) / 3 - 90) + 'px'
+                text.style.textAlign = 'center'
                 removeElements()
             }, 3000)
         }, 180)
@@ -280,6 +281,18 @@ let chart = new Chart(document.getElementById("line-chart"), {
             label: "BMI",
             borderColor: "#3e95cd",
             fill: false
+        },
+        {
+            data: [],
+            label: "Weight",
+            borderColor: "#48cd3e",
+            fill: false
+        },
+        {
+            data: [],
+            label: "Height",
+            borderColor: "#cd3e3e",
+            fill: false
         }
         ]
     },
@@ -293,9 +306,10 @@ let chart = new Chart(document.getElementById("line-chart"), {
 
 function addData(chart, label, data) {
     chart.data.labels.push(label);
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.push(data);
-    });
+    chart.data.datasets[0].data.push(data[0]);
+    chart.data.datasets[1].data.push(data[1]);
+    chart.data.datasets[2].data.push(data[2]);
+
     chart.update();
 }
 
