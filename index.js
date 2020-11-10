@@ -75,11 +75,11 @@ function updateBoard(res) {
             addData(chart, res.data.BMI.length, {data: res.data.BMI[res.data.BMI.length-1]}, 0)
         }
         let results = ['Too thin', 'Normal BMI', 'Slightly overweight', 'Obese', 'You are Morbidly Obese!', 'Old Man']
-        // document.getElementById('bmiText').innerHTML = getMessageAcross(res.data.BMI, res.data.age, results)
+        document.getElementById('text').innerHTML = getMessageAcross(res.data.BMI[res.data.BMI.length-1], res.data.age, results)
         // spinTextNode(document.getElementById('bmiTextAnim'),
         //     getMessageAcross(res.data.BMI, res.data.age, results), 2, true)
-        if (JSON.stringify(res.data.BMI) !== JSON.stringify([])) lotteryWrapper(results,
-            getMessageAcross(res.data.BMI[res.data.BMI.length-1], res.data.age, results))
+        // if (JSON.stringify(res.data.BMI) !== JSON.stringify([])) lotteryWrapper(results,
+        //     getMessageAcross(res.data.BMI[res.data.BMI.length-1], res.data.age, results))
     } catch (e) {}
 }
 
@@ -128,7 +128,7 @@ function getMessageAcross(bmi, age, results) {
             if (bmi > 39 + i)                   return results[4];
         }
     }
-    // if (bmi > 60) return 'Chunky Old Man';
+    if (bmi > 60) return 'Chunky Old Man';
     return 'Old Man';
 }
 
@@ -273,6 +273,9 @@ window.addEventListener('scroll', () => removeElements())
 function removeElements() {
     document.querySelectorAll('#evaluation').forEach(e => {e.remove()})
 }
+
+
+
 
 let chart = new Chart(document.getElementById("line-chart"), {
     type: 'line',

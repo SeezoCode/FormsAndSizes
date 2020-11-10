@@ -1,11 +1,35 @@
+// Here: ↓ ↓ ↓ ↓ ↓ ↓
+const IP = 'localhost'
+//       ↑ ↑ ↑ ↑ ↑ ↑
+// Address automatically fills in port and everything necessary
 let addr
+const port = 8080
 const http = require('http');
 const fs = require('fs')
-require('dns').lookup(require('os').hostname(), function (err, add, fam) {
-    console.log(`http://localhost:8080`);
-    // addr = `http://${add}:8080`
-    addr = `http://localhost:8080`
-})
+
+const { networkInterfaces } = require('os');
+
+const nets = networkInterfaces();
+const results = Object.create(null); // or just '{}', an empty object
+
+for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+        // skip over non-ipv4 and internal (i.e. 127.0.0.1) addresses
+        if (net.family === 'IPv4' && !net.internal) {
+            if (!results[name]) {
+                results[name] = [];
+            }
+
+            results[name].push(net.address);
+        }
+    }
+}
+
+addr = `http://${IP}:${port}`
+console.log("Your IPs: ", results)
+console.log("Your link: ", addr)
+console.log(`If you would like to use a different IP (perhaps to enable access on your phone), edit line 2 in server.js`)
+
 
 let users
 try {
@@ -124,7 +148,7 @@ server.on('request', (req, res) => {
         })
     }
 })
-server.listen(8080);
+server.listen(port);
 
 
 function response(res, data) {
