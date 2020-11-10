@@ -39,7 +39,7 @@ async function postToServer(data) {
         })
         let res = await response.json()
 
-        console.log(res)
+        // console.log(res)
         document.getElementById('signedInIndicator').innerHTML = res.message || res
 
         // let sex = document.getElementById('sex')
@@ -60,21 +60,24 @@ function updateBoard(res) {
 
         console.log(res)
         if (!chart.data.labels.length || refreshGraph) {
-            res.data.BMI.forEach((e, i) => {
-                addData(chart, i + 1, [e, res.data.weight[i], res.data.height[i]])
-            })
-            console.log(1, refreshGraph)
+            chart.data.datasets = []
+            for (let i = 0; i < res.data.allBMI.length; i++)
+                if (!(JSON.stringify(res.data.allBMI[i].data) === JSON.stringify(res.data.BMI))) {
+                    createLine(chart, res.data.allBMI[i], '#3e95cd')
+                }
+                else {
+                    createLine(chart, {name: 'Your BMI', data: res.data.BMI}, "#cd3e3e")
+                }
             refreshGraph = false
-        }
+            }
+
         else {
-            addData(chart, res.data.BMI.length, [res.data.BMI[res.data.BMI.length-1], res.data.weight[res.data.weight.length-1], res.data.height[res.data.height.length-1]])
-            console.log(2)
+            addData(chart, res.data.BMI.length, {data: res.data.BMI[res.data.BMI.length-1]}, 0)
         }
         let results = ['Too thin', 'Normal BMI', 'Slightly overweight', 'Obese', 'You are Morbidly Obese!', 'Old Man']
         // document.getElementById('bmiText').innerHTML = getMessageAcross(res.data.BMI, res.data.age, results)
         // spinTextNode(document.getElementById('bmiTextAnim'),
         //     getMessageAcross(res.data.BMI, res.data.age, results), 2, true)
-        console.log(res.data.BMI)
         if (JSON.stringify(res.data.BMI) !== JSON.stringify([])) lotteryWrapper(results,
             getMessageAcross(res.data.BMI[res.data.BMI.length-1], res.data.age, results))
     } catch (e) {}
@@ -157,7 +160,6 @@ function spinTextNode(element, text, speed, exitScreen) {
     // let time = 0 // 0 represents 0; Pi / 2 represents 1; Pi represents 0
     let width = window.innerWidth
     textNode = spawnText(element, text)
-    // console.log(getComputedStyle(textNode))
 
     gsap.to(textNode, {
         duration: speed / 2,
@@ -275,40 +277,24 @@ function removeElements() {
 let chart = new Chart(document.getElementById("line-chart"), {
     type: 'line',
     data: {
-        labels: [],
-        datasets: [{
-            data: [],
-            label: "BMI",
-            borderColor: "#3e95cd",
-            fill: false
-        },
-        {
-            data: [],
-            label: "Weight",
-            borderColor: "#48cd3e",
-            fill: false
-        },
-        {
-            data: [],
-            label: "Height",
-            borderColor: "#cd3e3e",
-            fill: false
-        }
+        labels: [1,2,3,4,5,6,7,8,9],
+        datasets: [
+            // add here the array of objects
         ]
     },
     options: {
         title: {
             display: true,
-            text: 'Your data visualized'
+            text: 'Your data, visualized'
         }
     }
 });
 
-function addData(chart, label, data) {
+function addData(chart, label, data, i) {
+    // console.log(data)
     chart.data.labels.push(label);
-    chart.data.datasets[0].data.push(data[0]);
-    chart.data.datasets[1].data.push(data[1]);
-    chart.data.datasets[2].data.push(data[2]);
+    chart.data.datasets[i].data.push(data.data);
+    // console.log(data[1], 11111)
 
     chart.update();
 }
@@ -318,5 +304,42 @@ function removeData(chart) {
     chart.data.datasets.forEach((dataset) => {
         dataset.data = [];
     });
+    chart.update();
+}
+
+function createLine(chart, data, color) {
+    // console.log(data)
+
+    if (color === "#cd3e3e") {
+        chart.data.datasets.unshift({
+            data: data.data,
+            label: data.name,
+            borderColor: color,
+            fill: false
+        })
+        chart.data.labels = data.data.map((data, i) => {
+            return i + 1
+        })
+    }
+    else {
+        data.data = data.data.map(e => {
+            if (e > 200) return 200
+            return e
+        })
+        chart.data.datasets.push({
+            data: data.data,
+            label: data.name || 'SED', // Stand for Somebody Else's Data :D
+            borderColor: `rgb(${getRandom(0, 100)}, ${getRandom(80, 170)}, ${getRandom(150, 255)}`,
+            fill: false
+        })
+    }
+
+    function getRandom(from, to) {
+        let random = Math.random() * to
+        if (random * to < to && random * to > from) {
+            return random * to
+        }
+        return getRandom(from, to)
+    }
     chart.update();
 }

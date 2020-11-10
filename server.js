@@ -2,8 +2,9 @@ let addr
 const http = require('http');
 const fs = require('fs')
 require('dns').lookup(require('os').hostname(), function (err, add, fam) {
-    console.log(`http://${add}:8080`);
-    addr = `http://${add}:8080`
+    console.log(`http://localhost:8080`);
+    // addr = `http://${add}:8080`
+    addr = `http://localhost:8080`
 })
 
 let users
@@ -46,11 +47,24 @@ function pushHeight(user, height) {
     user.data.height.push(height);
 }
 
+function getAllBmi() {
+    return users.map(user => {
+        return {
+            data: user.data.BMI,
+            name: user.data.name
+        }
+    })
+}
+
 function userControl(email, password) {
+    email.replace(' ', '')
+    email = email.toLowerCase()
+
     for (let user of users) {
         if (user.email === email) {
             if (user.password === password) {
                 user.message = 'Logged in'
+                user.data.allBMI = getAllBmi()
                 return user
             }
             return 'wrong password'
@@ -71,6 +85,7 @@ function userData(email, data) {
             pushHeight(user, data.height)
             pushWeight(user, data.weight)
             updateBMI(user)
+            user.data.allBMI = getAllBmi()
             // user.data = data;
             user.message = 'user update successful!'
             return user
