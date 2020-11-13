@@ -14,7 +14,7 @@ Make sure you have Node.js installed on your computer. Then navigate to the file
 
 **Hey, the graph look fantastic** Thank you, it's from [Chart js](https://www.chartjs.org)
 
-**Won't I get addicted by the lottery-styled BMI result answer?** Unless your weight is ever-changing, you should get the same answer every time. It is not fun when you are able to predict future outcomes while not getting any prize for it.
+**Won't I get addicted by the lottery-styled BMI result answer?** *[Discontinued, can be enabled]* Unless your weight is ever-changing, you should get the same answer every time. It is not fun when you are able to predict future outcomes while not getting any prize for it.
 
 **Tips**
 Password is not mandatory, but would your profile then be secure? Also, your email doesn't have to be an email. 
