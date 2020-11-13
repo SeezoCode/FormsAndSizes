@@ -4,6 +4,8 @@
 **[How do I run](https://www.quora.com/When-was-running-invented) this code?**
 Make sure you have Node.js installed on your computer. Then navigate to the file in terminal and type in *node server.js*. Thereafter click or paste the link to your browser and you're done!
 
+**What does BMI even mean?** Basically, it means you are fat.
+
 **Why to use our BMI Calculator as opposed to others'?** ...
 
 **Why the data collection?** As stated on the site, it's to increase your positive experience. We want to truly ensure You get to experience, simply, the Best. You can also easilly track your fluent progress. Everything saves to a file, so you don't have to worry about losing your data after closing down the server.
